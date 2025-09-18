@@ -20,11 +20,10 @@ namespace Roulette.Infrastructure.Repositories
         public async Task CreateRoulette(UserModel userModel)
         {
             var connection = await _client.GetConnection();
-            var sql = $"INSERT INTO \"Ruleta\" (\"IdRoulette\", \"Roulettename\") VALUES (@IdRoulette,@Roulettename)";
+            var sql = $"INSERT INTO \"Ruleta\" (\"IdRoulette\") VALUES (@IdRoulette)";
             using (var cmd = new NpgsqlCommand(sql, connection))
             {
                 cmd.Parameters.AddWithValue("IdRoulette", userModel.IdRoulette);
-                cmd.Parameters.AddWithValue("Roulettename", userModel.Roulettename);
                 await cmd.ExecuteNonQueryAsync();
             }
 

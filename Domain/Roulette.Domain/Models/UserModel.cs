@@ -9,6 +9,5 @@ namespace Roulette.Domain.Models
     public class UserModel
     {
         public string IdRoulette { get; set; }
-        public string Roulettename { get; set; }
     }
 }

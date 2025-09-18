@@ -20,8 +20,6 @@ namespace Roulette.Controllers
         {
             var model = new UserModel();
             model.IdRoulette = Guid.NewGuid().ToString();
-            model.Roulettename = model.IdRoulette;
-            //model.Roulettename = rouletteRequest.Roulettename;
             await _userService.CreateRoulette(model);
             return Created("Roulette: ",model);
         }
