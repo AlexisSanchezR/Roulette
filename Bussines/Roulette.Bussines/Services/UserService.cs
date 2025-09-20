@@ -19,17 +19,38 @@ namespace Roulette.Bussines.Services
             _dbRepository = dbRepository;
         }
 
-        public async Task CreateRoulette(UserModel userModel)
+        public async Task CreateRoulette(RouletteModel roulettemodel)
         {
             try
             {
-                await _dbRepository.CreateRoulette(userModel);
+                await _dbRepository.CreateRoulette(roulettemodel);
+            }
+            catch (Exception)
+            {
+                Log.Error($"Error: {JsonConvert.SerializeObject(roulettemodel)}");
+                throw;
+            }
+        }
+        public async Task<bool> ChangeState(string rouletteId, RouletteState newState)
+        {
+            return await _dbRepository.ChangeState(rouletteId, newState);
+        }
+
+        public async Task CreateUser(UserModel userModel)
+        {
+            try
+            {
+                await _dbRepository.CreateUser(userModel);
             }
             catch (Exception)
             {
                 Log.Error($"Error: {JsonConvert.SerializeObject(userModel)}");
                 throw;
             }
+        }
+        public async Task<bool> CreateBet(string idRoulette, string userId, BetModel bet)
+        {
+           return await _dbRepository.CreateBet(idRoulette, userId, bet);
         }
     }
 }

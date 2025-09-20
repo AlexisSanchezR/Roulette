@@ -9,6 +9,9 @@ namespace Roulette.Bussines.Interfaces
 {
     public interface IUserService
     {
-        public Task CreateRoulette(UserModel userModel);
+        public Task CreateRoulette(RouletteModel roulettemodel);
+        public Task<bool> ChangeState(string rouletteId, RouletteState newState);
+        public Task CreateUser(UserModel userModel);
+        public Task<bool> CreateBet(string idRoulette, string userId, BetModel bet);
     }
 }

@@ -9,6 +9,9 @@ namespace Roulette.Infrastructure.Interfaces
 {
     public interface IDBRepository
     {
-        public Task CreateRoulette(UserModel userModel);
+        public Task CreateRoulette(RouletteModel rouletteModel);
+        public Task<bool> ChangeState(string rouletteId, RouletteState newState);
+        public Task CreateUser(UserModel userModel);
+        public Task<bool> CreateBet(string idRoulette, string userId, BetModel bet);
     }
 }
