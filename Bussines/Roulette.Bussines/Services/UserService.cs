@@ -66,7 +66,7 @@ namespace Roulette.Bussines.Services
                 throw new Exception("Color bet must be 'red' or 'black'");
             }
            
-            //validación de la ruleta
+            //PENDIENTE: validación de la ruleta
             //DEbo verificar tambien que la ruleta exista ((Metodo Get))
             var rouletteOpen = await _dbRepository.IsRouletteOpen(idRoulette);
             if (!rouletteOpen)
@@ -92,6 +92,11 @@ namespace Roulette.Bussines.Services
         public async Task<List<BetModel>> BetsPlacedByRoulette(string rouletteId)
         {
             return await _dbRepository.BetsPlacedByRoulette(rouletteId);
+        }
+
+        public async Task<List<RouletteModel>> GetAllRoulettes()
+        {
+            return await _dbRepository.GetAllRoulettes();
         }
     }
 }

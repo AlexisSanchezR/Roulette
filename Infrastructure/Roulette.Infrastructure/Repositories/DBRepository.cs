@@ -120,5 +120,29 @@ namespace Roulette.Infrastructure.Repositories
 
         }
 
+        public async Task<List<RouletteModel>> GetAllRoulettes()
+        {
+            var roulettes = new List<RouletteModel>();
+            var connection = await _client.GetConnection();
+            string sql = "SELECT \"IdRoulette\", \"State\" FROM \"Ruleta\"";
+
+            using (var cmd = new NpgsqlCommand(sql, connection))
+            {
+                using ( var reader = await cmd.ExecuteReaderAsync())
+                {
+                    while(await reader.ReadAsync())
+                    {
+                        roulettes.Add(new RouletteModel
+                        {
+                            IdRoulette = reader.GetString(0),
+                            State = Enum.Parse<RouletteState>(reader.GetString(1)),
+                        });
+                    }
+                }
+            }
+            return roulettes;
+
+        }
+
     }
 }

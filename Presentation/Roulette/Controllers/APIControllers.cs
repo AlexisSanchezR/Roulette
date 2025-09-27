@@ -1,5 +1,4 @@
-﻿using Microsoft.AspNetCore.Http.HttpResults;
-using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Mvc;
 using Roulette.Bussines.Interfaces;
 using Roulette.Domain.Models;
 using Roulette.Models;
@@ -11,21 +10,22 @@ namespace Roulette.Controllers
     public class APIControllers : ControllerBase
     {
         private readonly IUserService _userService;
-        public APIControllers(IUserService userService) {
+        public APIControllers(IUserService userService)
+        {
             _userService = userService;
         }
 
         [HttpPost("Create-Roulette")]
-        public async Task<IActionResult> CreateRoulette([FromBody]UserRequest rouletteRequest)
+        public async Task<IActionResult> CreateRoulette([FromBody] UserRequest rouletteRequest)
         {
             var model = new RouletteModel();
             model.IdRoulette = Guid.NewGuid().ToString();
             await _userService.CreateRoulette(model);
-            return Created("Roulette: ",model);
+            return Created("Roulette: ", model);
         }
 
-        [HttpPost("{rouletteId}/Open")]
-        public async Task<IActionResult> OpenRoulette (string rouletteId)
+        [HttpGet("{rouletteId}/Open")]
+        public async Task<IActionResult> OpenRoulette(string rouletteId)
         {
             var updated = await _userService.ChangeState(rouletteId, RouletteState.Open);
             if (!updated)
@@ -35,8 +35,8 @@ namespace Roulette.Controllers
             return Ok(new { Message = "Roulette Opened Successfully" });
         }
 
-        [HttpPost("{rouletteId}/Close")]
-        public async Task<IActionResult> CloseRoulette (string rouletteId)
+        [HttpGet("{rouletteId}/Close")]
+        public async Task<IActionResult> CloseRoulette(string rouletteId)
         {
             var updated = await _userService.ChangeState(rouletteId, RouletteState.Close);
             if (!updated)
@@ -49,7 +49,7 @@ namespace Roulette.Controllers
         }
 
         [HttpPost("Create-User")]
-        public async Task<IActionResult> CreateUser([FromBody] UserRequest userRequest )
+        public async Task<IActionResult> CreateUser([FromBody] UserRequest userRequest)
         {
             var model = new UserModel();
             model.IdUser = Guid.NewGuid().ToString();
@@ -69,15 +69,23 @@ namespace Roulette.Controllers
                 var result = await _userService.CreateBet(rouletteId, userId, bet);
 
                 if (result)
+                {
                     return Ok(new { Message = "Bet placed successfully" });
-
-                // Esta línea casi nunca se ejecutará porque si algo falla lanza excepción
+                }
                 return StatusCode(500, new { Message = "Unexpected error" });
             }
             catch (Exception ex)
             {
                 return BadRequest(new { Message = ex.Message });
             }
+        }
+
+        [HttpGet]
+        [Route("getAll-Roulettes")]
+        public async Task<IActionResult> GetAllRoulettes()
+        {
+            var roulettes = await _userService.GetAllRoulettes();
+            return StatusCode(StatusCodes.Status200OK, roulettes);
         }
     }
 }

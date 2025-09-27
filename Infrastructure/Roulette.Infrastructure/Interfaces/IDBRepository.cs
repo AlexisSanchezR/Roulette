@@ -15,5 +15,6 @@ namespace Roulette.Infrastructure.Interfaces
         public Task<bool> CreateBet(string idRoulette, string userId, BetRequestModel bet);
         public Task<bool> IsRouletteOpen(string rouletteId);
         public Task<List<BetModel>> BetsPlacedByRoulette(string rouletteId);
+        public Task<List<RouletteModel>> GetAllRoulettes();
     }
 }
