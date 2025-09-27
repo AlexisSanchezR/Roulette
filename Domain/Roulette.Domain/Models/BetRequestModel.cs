@@ -6,13 +6,10 @@ using System.Threading.Tasks;
 
 namespace Roulette.Domain.Models
 {
-    public class BetModel
+    public class BetRequestModel
     {
-        public string IdRoulette { get; set; }
-        public string UserId { get; set; }
         public int? Number { get; set; }
         public string Color { get; set; }
         public decimal Amount { get; set; }
-        public string IdBet { get; set; }
     }
 }

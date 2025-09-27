@@ -3,6 +3,7 @@ using Roulette.Domain.Models;
 using Roulette.Infrastructure.Interfaces;
 using System;
 using System.Collections.Generic;
+using System.Data;
 using System.Drawing;
 using System.Linq;
 using System.Text;
@@ -55,10 +56,10 @@ namespace Roulette.Infrastructure.Repositories
             }
         }
 
-        public async Task<bool> CreateBet(string idRoulette, string userId, BetModel bet)
+        public async Task<bool> CreateBet(string idRoulette, string userId, BetRequestModel bet)
         {
             var connection = await _client.GetConnection();
-            var sql = @"INSERT INTO ""Apuesta"" (""IdRoulette"", ""UserId"", ""Number"", ""Color"", ""Amount"") VALUES (@IdRoulette, @UserId, @Number, @Color, @Amount)";
+            var sql = @"INSERT INTO ""Apuesta"" (""IdRoulette"", ""UserId"", ""Number"", ""Color"", ""Amount"", ""IdBet"") VALUES (@IdRoulette, @UserId, @Number, @Color, @Amount, @IdBet)";
             using (var cmd = new NpgsqlCommand(sql, connection))
             {
                 cmd.Parameters.AddWithValue("IdRoulette", idRoulette);
@@ -66,9 +67,58 @@ namespace Roulette.Infrastructure.Repositories
                 cmd.Parameters.AddWithValue("Number", (object?)bet.Number ?? DBNull.Value);
                 cmd.Parameters.AddWithValue("Color", (object?)bet.Color ?? DBNull.Value);
                 cmd.Parameters.AddWithValue("Amount", bet.Amount);
+                cmd.Parameters.AddWithValue("IdBet", Guid.NewGuid().ToString());
                 var rowsAffected = await cmd.ExecuteNonQueryAsync();
                 return rowsAffected > 0;
             }
         }
+
+        public async Task<bool> IsRouletteOpen (string rouletteId)
+        {
+            var connection = await _client.GetConnection();
+            var sql = @"SELECT ""State"" FROM ""Ruleta"" WHERE ""IdRoulette"" = @IdRoulette";
+            using (var cmd = new NpgsqlCommand(sql, connection))
+            {
+                cmd.Parameters.AddWithValue("Idroulette", rouletteId);
+
+                var result = await cmd.ExecuteScalarAsync();
+                if (result == null) 
+                {
+                    return false;
+                }
+                return result.ToString() == RouletteState.Open.ToString();
+            }
+        }
+
+        public async Task <List<BetModel>> BetsPlacedByRoulette(string rouletteId) 
+        { 
+            var bets = new List<BetModel>();
+            var connection = await _client.GetConnection();
+            string sql = @"SELECT ""IdRoulette"", ""UserId"", ""Number"", ""Color"", ""Amount"", ""IdBet"" FROM ""Apuesta"" WHERE ""IdRoulette"" = @IdRoulette";
+
+            using ( var cmd = new NpgsqlCommand(sql,connection))
+            
+            {
+                cmd.Parameters.AddWithValue("@IdRoulette", rouletteId);
+                using ( var reader = await cmd.ExecuteReaderAsync() )
+                {
+                    while (await reader.ReadAsync())
+                    {
+                        bets.Add(new BetModel
+                        {
+                            IdRoulette = reader.GetString(0),
+                            UserId = reader.GetString(1),
+                            Number = reader.IsDBNull(2) ? null : reader.GetInt16(2),
+                            Color = reader.IsDBNull(3) ? null : reader.GetString(3),
+                            Amount = reader.GetDecimal(4),
+                            IdBet = reader.GetString(5),
+                        });
+                    }
+                }
+            }
+            return bets;
+
+        }
+
     }
 }

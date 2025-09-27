@@ -1,4 +1,5 @@
 ﻿using Autofac;
+using Microsoft.OpenApi.Models;
 using Roulette.IoCContainer;
 using Serilog;
 using Serilog.Core;
@@ -25,7 +26,24 @@ namespace Roulette
             services.AddLogging(loggingBuilder => loggingBuilder.AddSerilog());
             services.AddMvc();
             services.AddHealthChecks();
-            services.AddSwaggerGen();
+            //services.AddSwaggerGen();
+
+            // 🔹 Swagger configurado con header personalizado
+            services.AddSwaggerGen(c =>
+            {
+                // Definición del header "User-Id"
+                c.AddSecurityDefinition("User-Id", new OpenApiSecurityScheme
+                {
+                    Name = "User-Id",
+                    Type = SecuritySchemeType.ApiKey,
+                    In = ParameterLocation.Header,
+                    Description = "User ID requerido en el header para realizar apuestas"
+                });
+
+                // Aplicamos un filtro para agregarlo a los endpoints
+                c.OperationFilter<AddRequiredHeaderParameter>();
+            });
+
         }
 
         public void ConfigureContainer(ContainerBuilder builder)

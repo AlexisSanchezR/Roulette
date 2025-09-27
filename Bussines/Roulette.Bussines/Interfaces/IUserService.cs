@@ -12,6 +12,8 @@ namespace Roulette.Bussines.Interfaces
         public Task CreateRoulette(RouletteModel roulettemodel);
         public Task<bool> ChangeState(string rouletteId, RouletteState newState);
         public Task CreateUser(UserModel userModel);
-        public Task<bool> CreateBet(string idRoulette, string userId, BetModel bet);
+        public Task<bool> CreateBet(string idRoulette, string userId, BetRequestModel bet);
+        public Task<bool> IsRouletteOpen(string rouletteId);
+        public Task<List<BetModel>> BetsPlacedByRoulette(string rouletteId);
     }
 }
