@@ -87,5 +87,21 @@ namespace Roulette.Controllers
             var roulettes = await _userService.GetAllRoulettes();
             return StatusCode(StatusCodes.Status200OK, roulettes);
         }
+        [HttpGet]
+        [Route("getRouletteById")]
+        public async Task<IActionResult>GetRouletteById(string rouletteId)
+        {
+            var roulette = await _userService.GetRouletteById(rouletteId);
+            return StatusCode(StatusCodes.Status200OK,roulette);
+        }
+
+        [HttpGet]
+        [Route("getUserById")]
+        public async Task<UserModel> GetUserById(string userId)
+        {
+            var user = await _userService.GetUserById(userId);
+            return user;
+
+        }
     }
 }

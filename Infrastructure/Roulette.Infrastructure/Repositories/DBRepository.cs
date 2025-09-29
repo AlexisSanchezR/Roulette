@@ -1,6 +1,7 @@
 ﻿using Npgsql;
 using Roulette.Domain.Models;
 using Roulette.Infrastructure.Interfaces;
+using Serilog;
 using System;
 using System.Collections.Generic;
 using System.Data;
@@ -142,6 +143,79 @@ namespace Roulette.Infrastructure.Repositories
             }
             return roulettes;
 
+        }
+        public async Task<RouletteModel>GetRouletteById (string rouletteId)
+        {
+            var connection = await _client.GetConnection();
+            var sql = @"SELECT ""IdRoulette"" FROM ""Ruleta"" WHERE ""IdRoulette"" = @IdRoulette";
+
+            using ( var cmd = new NpgsqlCommand(sql,connection))
+            {
+                cmd.Parameters.AddWithValue("@IdRoulette", rouletteId);
+                using( var reader = await cmd.ExecuteReaderAsync())
+                {
+                    if (await reader.ReadAsync())
+                    {
+                        string RouletteId = reader.GetString(0);
+                        //string State = reader.GetString(1);
+
+                        return new RouletteModel
+                        {
+                            IdRoulette = rouletteId,
+                           // State = state,
+                        };
+                    }
+                    else
+                    {
+                        Log.Error("An error occurred while finding the roulette by id.");
+                        return null; 
+                    }
+                }
+            }
+        }
+        public async Task<UserModel> GetUserById(string userId)
+        {
+            var connection = await _client.GetConnection();
+            var sql = @"SELECT ""IdUser"", ""Credit"" FROM ""User"" WHERE ""IdUser"" = @IdUser";
+
+            using (var cmd = new NpgsqlCommand(sql, connection))
+            {
+                cmd.Parameters.AddWithValue("@IdUser", userId);
+                using (var reader = await cmd.ExecuteReaderAsync())
+                {
+                    if (await reader.ReadAsync())
+                    {
+                        string idUser = reader.GetString(reader.GetOrdinal("IdUser"));
+                        decimal credit = reader.GetDecimal(reader.GetOrdinal("Credit"));
+
+                        return new UserModel
+                        {
+                            IdUser = userId,
+                            Credit = credit,
+                        };
+                    }
+                    else
+                    {
+                        Log.Error("An error occurred while finding the user by id.");
+                        return null;
+                    }
+                }
+            }
+        }
+
+        public async Task<bool> UpdateUserCredit (UserModel userModel)
+        {
+            var connection = await _client.GetConnection();
+            var sql = @"UPDATE ""User"" SET ""Credit"" = @Credit WHERE ""IdUser"" = @IdUser";
+
+            using ( var cmd = new NpgsqlCommand(sql, connection))
+            {
+                cmd.Parameters.AddWithValue("IdUser", userModel.IdUser);
+                cmd.Parameters.AddWithValue("Credit", userModel.Credit);
+
+                var rowsAffected = await cmd.ExecuteNonQueryAsync();
+                return rowsAffected > 0;
+            }
         }
 
     }

@@ -5,7 +5,9 @@ using Roulette.Infrastructure.Interfaces;
 using Serilog;
 using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 using System.Linq;
+using System.Security.AccessControl;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -65,13 +67,36 @@ namespace Roulette.Bussines.Services
             {
                 throw new Exception("Color bet must be 'red' or 'black'");
             }
-           
-            //PENDIENTE: validación de la ruleta
-            //DEbo verificar tambien que la ruleta exista ((Metodo Get))
+
+            var roulette = await _dbRepository.GetRouletteById(idRoulette);
+            if (roulette == null)
+            {
+                throw new Exception("Roulette not found");
+            }
+
             var rouletteOpen = await _dbRepository.IsRouletteOpen(idRoulette);
             if (!rouletteOpen)
             {
                 throw new Exception("Roulette is not Open");
+            }
+
+            var user = await _dbRepository.GetUserById(userId);
+            if (user == null)
+            {
+                throw new Exception("User not found");
+            }
+
+            if(user.Credit < bet.Amount)
+            {
+                throw new Exception($"Insufficient credit. Available: {user.Credit}, Required: {bet.Amount}");
+            }
+            user.Credit -= bet.Amount;
+
+            //Actualizo el credito en la BD
+            var updated = await _dbRepository.UpdateUserCredit(user);
+            if (!updated)
+            {
+                throw new Exception("Error updating user credit");
             }
 
             //crear apuesta 
@@ -97,6 +122,38 @@ namespace Roulette.Bussines.Services
         public async Task<List<RouletteModel>> GetAllRoulettes()
         {
             return await _dbRepository.GetAllRoulettes();
+        }
+        public async Task<RouletteModel> GetRouletteById(string rouletteId)
+        {
+            var roulette = await _dbRepository.GetRouletteById(rouletteId);
+            try
+            {
+                if (roulette == null)
+                {
+                    throw new KeyNotFoundException($"Roulette not found. {rouletteId}");
+                }
+            }
+            catch (KeyNotFoundException)
+            {
+                Log.Error("An error occurred while finding the roulette by id.");
+            }
+            return roulette;
+        }
+        public async Task<UserModel> GetUserById(string userId)
+        {
+            var user = await _dbRepository.GetUserById(userId);
+            try
+            {
+                if (user == null)
+                {
+                    throw new KeyNotFoundException($"User not found. {user}");
+                }
+            }
+            catch (KeyNotFoundException)
+            {
+                Log.Error("An error occurred while finding the user by id.");
+            }
+            return user;
         }
     }
 }

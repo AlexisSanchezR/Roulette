@@ -16,5 +16,7 @@ namespace Roulette.Bussines.Interfaces
         public Task<bool> IsRouletteOpen(string rouletteId);
         public Task<List<BetModel>> BetsPlacedByRoulette(string rouletteId);
         public Task<List<RouletteModel>> GetAllRoulettes();
+        public Task<RouletteModel> GetRouletteById(string rouletteId);
+        public Task<UserModel> GetUserById(string userId);
     }
 }

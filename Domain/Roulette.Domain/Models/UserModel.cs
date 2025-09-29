@@ -9,6 +9,6 @@ namespace Roulette.Domain.Models
     public class UserModel
     {
         public string IdUser { get; set; }
-        public string Credit { get; set; }
+        public decimal Credit { get; set; }
     }
 }

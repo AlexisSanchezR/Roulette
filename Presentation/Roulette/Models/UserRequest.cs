@@ -2,6 +2,6 @@
 {
     public class UserRequest
     {
-        public string Credit { get; set; }
+        public decimal Credit { get; set; }
     }
 }
