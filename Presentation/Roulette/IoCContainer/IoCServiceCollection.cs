@@ -56,7 +56,7 @@ namespace Roulette.IoCContainer
         {
             builder
                 .Register((context, parameters) => new UserService(
-                    context.Resolve<IDBRepository>()
+                    context.Resolve<IDBRepositoryEF>()
                     ))
                 .As<IUserService>()
                 .SingleInstance();

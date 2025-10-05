@@ -14,12 +14,11 @@ namespace Roulette.Controllers
         {
             _userService = userService;
         }
-
+        
         [HttpPost("Create-Roulette")]
-        public async Task<IActionResult> CreateRoulette([FromBody] UserRequest rouletteRequest)
+        public async Task<IActionResult> CreateRoulette()
         {
             var model = new RouletteModel();
-            //model.IdRoulette = Guid.NewGuid().ToString();
             await _userService.CreateRoulette(model);
             return Created("Roulette: ", model);
         }
@@ -52,7 +51,6 @@ namespace Roulette.Controllers
         public async Task<IActionResult> CreateUser([FromBody] UserRequest userRequest)
         {
             var model = new UserModel();
-            //model.IdUser = Guid.NewGuid().ToString();
             model.Credit = userRequest.Credit;
             await _userService.CreateUser(model);
             return Created("created user", userRequest);
