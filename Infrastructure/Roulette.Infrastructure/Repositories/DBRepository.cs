@@ -57,7 +57,7 @@ namespace Roulette.Infrastructure.Repositories
             }
         }
 
-        public async Task<bool> CreateBet(string idRoulette, string userId, BetRequestModel bet)
+        public async Task<bool> CreateBet(string idRoulette, string userId, BetModel bet)
         {
             var connection = await _client.GetConnection();
             var sql = @"INSERT INTO ""Apuesta"" (""IdRoulette"", ""UserId"", ""Number"", ""Color"", ""Amount"", ""IdBet"") VALUES (@IdRoulette, @UserId, @Number, @Color, @Amount, @IdBet)";

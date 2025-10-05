@@ -1,6 +1,8 @@
 ﻿using Autofac;
 using Microsoft.OpenApi.Models;
+using Roulette.Infrastructure.Data;
 using Roulette.IoCContainer;
+using Microsoft.EntityFrameworkCore;
 using Serilog;
 using Serilog.Core;
 using Serilog.Events;
@@ -27,6 +29,8 @@ namespace Roulette
             services.AddMvc();
             services.AddHealthChecks();
             //services.AddSwaggerGen();
+
+            services.AddDbContext<AppDbContext>(options => options.UseSqlServer(Configuration.GetConnectionString("DefaultConnection")));
 
             // 🔹 Swagger configurado con header personalizado
             services.AddSwaggerGen(c =>

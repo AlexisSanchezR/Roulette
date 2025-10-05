@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace Roulette.Infrastructure.Interfaces
 {
-    public interface IDBRepository
+    public interface IDBRepositoryEF
     {
         public Task CreateRoulette(RouletteModel rouletteModel);
         public Task<bool> ChangeState(string rouletteId, RouletteState newState);
@@ -18,6 +18,6 @@ namespace Roulette.Infrastructure.Interfaces
         public Task<List<RouletteModel>> GetAllRoulettes();
         public Task<RouletteModel> GetRouletteById(string rouletteId);
         public Task<UserModel> GetUserById(string userId);
-        public Task<bool> UpdateUserCredit(UserModel userModel);
+        public Task<bool> UpdateUserCredit(UserModel user);
     }
 }

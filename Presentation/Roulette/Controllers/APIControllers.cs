@@ -19,7 +19,7 @@ namespace Roulette.Controllers
         public async Task<IActionResult> CreateRoulette([FromBody] UserRequest rouletteRequest)
         {
             var model = new RouletteModel();
-            model.IdRoulette = Guid.NewGuid().ToString();
+            //model.IdRoulette = Guid.NewGuid().ToString();
             await _userService.CreateRoulette(model);
             return Created("Roulette: ", model);
         }
@@ -52,21 +52,28 @@ namespace Roulette.Controllers
         public async Task<IActionResult> CreateUser([FromBody] UserRequest userRequest)
         {
             var model = new UserModel();
-            model.IdUser = Guid.NewGuid().ToString();
+            //model.IdUser = Guid.NewGuid().ToString();
             model.Credit = userRequest.Credit;
             await _userService.CreateUser(model);
             return Created("created user", userRequest);
         }
 
         [HttpPost("{rouletteId}/bet")]
-        public async Task<IActionResult> CreateBet(string rouletteId, [FromBody] BetRequestModel bet)
+        public async Task<IActionResult> CreateBet(string rouletteId, [FromBody] BetRequest bet)
         {
             if (!Request.Headers.TryGetValue("User-Id", out var userId))
                 return BadRequest(new { Message = "User-Id header is required" });
 
             try
             {
-                var result = await _userService.CreateBet(rouletteId, userId, bet);
+                var betModel = new BetModel
+                {
+                    Number = bet.Number,
+                    Color = bet.Color,
+                    Amount = bet.Amount
+                };
+
+                var result = await _userService.CreateBet(rouletteId, userId, betModel);
 
                 if (result)
                 {

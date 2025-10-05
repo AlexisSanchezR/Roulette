@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -13,6 +14,8 @@ namespace Roulette.Domain.Models
         public int? Number { get; set; }
         public string Color { get; set; }
         public decimal Amount { get; set; }
-        public string IdBet { get; set; }
+
+        [Key]
+        public string IdBet { get; set; } 
     }
 }

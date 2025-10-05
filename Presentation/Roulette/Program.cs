@@ -1,42 +1,52 @@
-using Autofac.Extensions.DependencyInjection;
-using Roulette;
 
-public class Program
+using Microsoft.EntityFrameworkCore;
+using Roulette.Bussines.Interfaces;
+using Roulette.Bussines.Services;
+using Roulette.Infrastructure.Data;
+using Roulette.Infrastructure.Interfaces;
+using Roulette.Infrastructure.Repositories;
+
+
+var builder = WebApplication.CreateBuilder(args);
+
+
+    builder.Services.AddDbContext<AppDbContext>(options =>
+    options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection"))
+);
+
+builder.Services.AddScoped<IDBRepositoryEF, DBRepositoryEF>();
+builder.Services.AddScoped<IUserService, UserService>();
+
+builder.Services.AddControllers();
+builder.Services.AddEndpointsApiExplorer();
+builder.Services.AddSwaggerGen();
+
+var app = builder.Build();
+
+using (var scope = app.Services.CreateScope())
 {
-    public static void Main(string[] args)
+    var db = scope.ServiceProvider.GetRequiredService<AppDbContext>();
+    try
     {
-        CreateHostBuilder(args).Build().Run();
+        db.Database.Migrate();
+        Console.WriteLine("Migraciones aplicadas correctamente.");
     }
-
-    private static IHostBuilder CreateHostBuilder(string[] args)
+    catch (Exception ex)
     {
-        var pathToContentRoot = AppDomain.CurrentDomain.BaseDirectory;
-        var configurationRoot = new ConfigurationBuilder()
-            .SetBasePath(pathToContentRoot)
-            .AddJsonFile("appsettings.json", true)
-            .Build();
-
-        return Host.CreateDefaultBuilder(args)
-
-            //inyeccion de dependencias con Autofac
-            .UseServiceProviderFactory(new AutofacServiceProviderFactory())
-            .ConfigureServices(services => { services.AddAutofac(); })
-
-            //Configuracion de la aplicacion
-            .ConfigureAppConfiguration((hostingContext, config) =>
-            {
-                config.SetBasePath(pathToContentRoot);
-                config.AddJsonFile("appsettings.json", true);
-                config.AddConfiguration(configurationRoot);
-            })
-
-            //configuracion del servidor web
-            .ConfigureWebHostDefaults(webBuilder =>
-            {
-                webBuilder
-                    .UseKestrel()
-                .UseIISIntegration()
-                    .UseStartup<Startup>();
-            });
+        Console.WriteLine($"Error aplicando migraciones: {ex.Message}");
     }
 }
+
+
+if (app.Environment.IsDevelopment())
+{
+    app.UseSwagger();
+    app.UseSwaggerUI();
+}
+
+app.UseHttpsRedirection();
+app.UseAuthorization();
+app.MapControllers();
+
+app.Run();
+

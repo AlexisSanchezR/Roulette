@@ -3,20 +3,13 @@ using Roulette.Bussines.Interfaces;
 using Roulette.Domain.Models;
 using Roulette.Infrastructure.Interfaces;
 using Serilog;
-using System;
-using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations;
-using System.Linq;
-using System.Security.AccessControl;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Roulette.Bussines.Services
 {
     public class UserService : IUserService
     {
-        private readonly IDBRepository _dbRepository;
-        public UserService( IDBRepository dbRepository)
+        private readonly IDBRepositoryEF _dbRepository;
+        public UserService( IDBRepositoryEF dbRepository)
         {
             _dbRepository = dbRepository;
         }
@@ -50,7 +43,7 @@ namespace Roulette.Bussines.Services
                 throw;
             }
         }
-        public async Task<bool> CreateBet(string idRoulette, string userId, BetRequestModel bet)
+        public async Task<bool> CreateBet(string idRoulette, string userId, BetModel bet)
         {
             //Validaciones
             if (bet.Amount <= 0 || bet.Amount >10000)
@@ -123,6 +116,7 @@ namespace Roulette.Bussines.Services
         {
             return await _dbRepository.GetAllRoulettes();
         }
+
         public async Task<RouletteModel> GetRouletteById(string rouletteId)
         {
             var roulette = await _dbRepository.GetRouletteById(rouletteId);
@@ -139,6 +133,7 @@ namespace Roulette.Bussines.Services
             }
             return roulette;
         }
+
         public async Task<UserModel> GetUserById(string userId)
         {
             var user = await _dbRepository.GetUserById(userId);
