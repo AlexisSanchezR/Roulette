@@ -20,7 +20,7 @@ namespace Roulette.Controllers
         {
             var model = new RouletteModel();
             await _userService.CreateRoulette(model);
-            return Created("Roulette: ", model);
+            return Created("Roulette successfully created: ", model);
         }
 
         [HttpGet("{rouletteId}/Open")]
